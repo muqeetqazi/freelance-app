@@ -87,7 +87,6 @@ class SplashScreenState extends State<SplashScreen> {
     // var isFirstLogin = SharePref.get(KEYFIRST);
     SharePref.getBool(Firstime);
     Timer(Duration(seconds: 4), () {
-      /*
       if (Firstime == null && Firstime == true) {
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => LandingScreen()));
@@ -100,9 +99,6 @@ class SplashScreenState extends State<SplashScreen> {
               MaterialPageRoute(builder: (context) => LoginScreen()));
         }
       }
-     */
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => LandingScreen()));
     });
   }
 }
