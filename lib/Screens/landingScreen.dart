@@ -10,7 +10,26 @@ class LandingScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Welcome to FreelanceApp'),
+        title: Column(
+          children: [
+            Image.asset(
+              'assets/name.png', // Replace with your image asset path
+              width: 150,
+              height: 100, // Adjust the width as needed
+            ),
+          ],
+        ),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              'assets/logo.png', // Replace with your logo asset path
+              width: 50,
+              height: 50,
+            ),
+          ),
+        ],
       ),
       body: Container(
         padding: EdgeInsets.all(20),
@@ -18,14 +37,6 @@ class LandingScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Text(
-              'Join FreelanceApp',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
             SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
@@ -55,7 +66,7 @@ class LandingScreen extends StatelessWidget {
   void _onClient(BuildContext context) async {
     var sharedPref = await SharedPreferences.getInstance();
     sharedPref.setBool('FirstTime', false);
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
     );
