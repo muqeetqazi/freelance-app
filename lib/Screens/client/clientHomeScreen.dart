@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/client/LoginScreen.dart';
 import 'package:freelanceapp/Screens/client/HiringScreen.dart';
-import 'package:freelanceapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -33,41 +32,91 @@ class ClientHomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Client Home'),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Welcome to Client Home!',
-              style: TextStyle(
-                fontSize: 24,
+      body: Stack(
+        children: [
+          // Background gradient
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFF01696E),
+                  const Color(0xFF67D9E9), // Lighter shade
+                ],
               ),
             ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HiringScreen()),
-                );
-              },
-              child: Text('View Jobs'),
+          ),
+          // Content
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.all(1.0),
+                child: Text(
+                  'Welcome to Client Home!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 28,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildButton('View Jobs', () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HiringScreen()),
+                        );
+                      }),
+                      SizedBox(height: 20),
+                      _buildButton('View Profile', () {
+                        // Add functionality to navigate to other screens
+                      }),
+                      SizedBox(height: 20),
+                      _buildButton('Log Out', () {
+                        onClickLogout(context);
+                      }),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButton(String text, VoidCallback onPressed) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: InkWell(
+        onTap: onPressed,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          padding: const EdgeInsets.all(16.0),
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(8.0),
+            border: Border.all(color: Colors.white),
+          ),
+          child: Center(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white,
+              ),
             ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                // Add functionality to navigate to other screens
-              },
-              child: Text('View Profile'),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                onClickLogout(context);
-              },
-              child: Text('Log Out'),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -75,7 +124,7 @@ class ClientHomeScreen extends StatelessWidget {
 
   void onClickLogout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool(SplashScreenState.KEYLOGIN, false);
+    prefs.setBool('isLoggedIn', false);
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
