@@ -85,9 +85,9 @@ class SplashScreenState extends State<SplashScreen> {
     var SharePref = await SharedPreferences.getInstance();
     var isLoggin = SharePref.getBool(KEYLOGIN);
     // var isFirstLogin = SharePref.get(KEYFIRST);
-    SharePref.getBool(Firstime);
+    var isFirstLogin = SharePref.getBool(Firstime);
     Timer(Duration(seconds: 4), () {
-      if (Firstime == null && Firstime == true) {
+      if (isFirstLogin == null) {
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => LandingScreen()));
       } else {

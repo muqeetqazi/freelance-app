@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
 import 'package:freelanceapp/Screens/client/clientHomeScreen.dart';
+import 'package:freelanceapp/Screens/landingScreen.dart';
 import 'package:freelanceapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -16,9 +18,14 @@ class _LoginScreenState extends State<LoginScreen> {
   String gmail = "";
   bool isPasswordVisible = false;
   bool isEmailCheck = false;
+  Color myColor = const Color(0xFF01696E);
+
   TextEditingController t = TextEditingController();
   TextEditingController t1 = TextEditingController();
   var passwords = TextEditingController();
+
+  bool isEmailFocused = false;
+  bool isPasswordFocused = false;
 
   @override
   void initState() {
@@ -34,7 +41,10 @@ class _LoginScreenState extends State<LoginScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LandingScreen()),
+            );
           },
         ),
         actions: [
@@ -49,84 +59,130 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
       body: Center(
-        child: Column(
-          children: [
-            Container(
-              width: 300,
-              height: 150,
-            ),
-            Container(
-              width: 300,
-              child: TextField(
-                controller: t,
-                obscureText: !isEmailCheck,
-                decoration: InputDecoration(
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(
-                      color: Colors.red.shade300,
-                      width: 2,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(height: 10),
+              Container(
+                width: 300,
+                child: TextField(
+                  controller: t,
+                  onChanged: (value) {
+                    setState(() {
+                      isEmailFocused = value.isNotEmpty;
+                    });
+                  },
+                  onTap: () {
+                    setState(() {
+                      isEmailFocused = true;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.email),
+                    labelText: 'Gmail',
+                    labelStyle: TextStyle(
+                      color: isEmailFocused ? myColor : Colors.black,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: isEmailFocused ? myColor : Colors.black,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: myColor,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(
-                      color: Colors.black,
-                      width: 2,
-                    ),
-                  ),
-                  prefixIcon: Icon(Icons.email),
-                  hintText: "Enter your gmail :",
                 ),
               ),
-            ),
-            Container(
-              height: 11,
-            ),
-            Container(
-              width: 300,
-              child: TextField(
-                controller: passwords,
-                obscureText: !isPasswordVisible, // Toggle password visibility
-                obscuringCharacter: "*",
-                decoration: InputDecoration(
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(
-                      color: Colors.red.shade300,
-                      width: 2,
+              SizedBox(height: 11),
+              Container(
+                width: 300,
+                child: TextField(
+                  controller: passwords,
+                  obscureText: !isPasswordVisible,
+                  onChanged: (value) {
+                    setState(() {
+                      isPasswordFocused = value.isNotEmpty;
+                    });
+                  },
+                  onTap: () {
+                    setState(() {
+                      isPasswordFocused = true;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.lock),
+                    labelText: 'Password',
+                    labelStyle: TextStyle(
+                      color: isPasswordFocused ? myColor : Colors.black,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: isPasswordFocused ? myColor : Colors.black,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: myColor,
+                        width: 2.0,
+                      ),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        isPasswordVisible
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isPasswordVisible = !isPasswordVisible;
+                        });
+                      },
                     ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(
-                      color: Colors.black,
-                      width: 2,
-                    ),
-                  ),
-                  prefixIcon: Icon(Icons.key),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      isPasswordVisible
-                          ? Icons.visibility
-                          : Icons.visibility_off,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        isPasswordVisible = !isPasswordVisible;
-                      });
-                    },
-                  ),
-                  hintText: "Enter your Password",
                 ),
               ),
-            ),
-            ElevatedButton(onPressed: onPressButton, child: Text("Login")),
-            SizedBox(height: 11),
-            Text(gmail),
-            SizedBox(height: 11),
-            Text(password),
-          ],
+              SizedBox(height: 11),
+              ElevatedButton(
+                onPressed: onPressButton,
+                child: Text(
+                  "Login",
+                ),
+              ),
+              SizedBox(height: 11),
+              GestureDetector(
+                onTap: onSignup,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Don't have an account? ",
+                      style: TextStyle(
+                        color: Colors.black,
+                      ),
+                    ),
+                    Text(
+                      'Sign up',
+                      style: TextStyle(
+                        color: myColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -178,5 +234,12 @@ class _LoginScreenState extends State<LoginScreen> {
       gmail = getgmail ?? '';
       password = getPass ?? '';
     });
+  }
+
+  void onSignup() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => SignUpScreen()),
+    );
   }
 }

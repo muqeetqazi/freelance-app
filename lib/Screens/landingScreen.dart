@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/client/LoginScreen.dart';
+import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
+import 'package:freelanceapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+Color myColor = const Color(0xFF01696E);
 
 class LandingScreen extends StatelessWidget {
   const LandingScreen({Key? key}) : super(key: key);
@@ -15,7 +19,7 @@ class LandingScreen extends StatelessWidget {
             Image.asset(
               'assets/name.png', // Replace with your image asset path
               width: 150,
-              height: 100, // Adjust the width as needed
+              height: 100,
             ),
           ],
         ),
@@ -24,7 +28,7 @@ class LandingScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Image.asset(
-              'assets/logo.png', // Replace with your logo asset path
+              'assets/logo.png',
               width: 50,
               height: 50,
             ),
@@ -33,6 +37,13 @@ class LandingScreen extends StatelessWidget {
       ),
       body: Container(
         padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.green.shade200, Colors.green.shade400],
+          ),
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -42,19 +53,92 @@ class LandingScreen extends StatelessWidget {
               onPressed: () {
                 _onClient(context);
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: myColor,
+                shadowColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 15),
+              ),
               child: Text(
                 'Join as Client',
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 18, color: Colors.white),
               ),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    height: 1,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  'OR',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    height: 1,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 _onFreelancer(context);
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: myColor,
+                shadowColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 15),
+              ),
               child: Text(
                 'Join as Freelancer',
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(fontSize: 18, color: Colors.white),
+              ),
+            ),
+            SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignUpScreen()),
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Don't have an account? ",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    'Sign up',
+                    style: TextStyle(
+                      color: myColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
               ),
             ),
           ],
@@ -65,7 +149,7 @@ class LandingScreen extends StatelessWidget {
 
   void _onClient(BuildContext context) async {
     var sharedPref = await SharedPreferences.getInstance();
-    sharedPref.setBool('FirstTime', false);
+    sharedPref.setBool(SplashScreenState.Firstime, false);
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -74,7 +158,7 @@ class LandingScreen extends StatelessWidget {
 
   void _onFreelancer(BuildContext context) async {
     var sharedPref = await SharedPreferences.getInstance();
-    sharedPref.setBool('FirstTime', false);
+    sharedPref.setBool(SplashScreenState.Firstime, false);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => FreelanceLoginScreen()),
