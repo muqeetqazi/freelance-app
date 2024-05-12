@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:freelanceapp/Screens/client/LoginScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,11 +56,44 @@ class SignUpScreen extends StatelessWidget {
               obscureText: true, // Hide password
             ),
             SizedBox(height: 20),
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                border: OutlineInputBorder(),
+              ),
+              obscureText: true, // Hide password
+            ),
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Add sign-up logic here
               },
               child: Text('Sign Up'),
+            ),
+            SizedBox(height: 20),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Already have an account? ',
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  Text(
+                    'Log in',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
