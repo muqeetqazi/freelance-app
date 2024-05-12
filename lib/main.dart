@@ -1,15 +1,18 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:freelanceapp/Screens/client/LoginScreen.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:freelanceapp/Screens/client/LoginScreen.dart';
 import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
 import 'package:freelanceapp/Screens/client/clientHomeScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
 import 'package:freelanceapp/Screens/landingScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
