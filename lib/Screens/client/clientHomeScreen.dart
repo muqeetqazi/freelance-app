@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/client/LoginScreen.dart';
+import 'package:freelanceapp/Screens/client/HiringScreen.dart';
 import 'package:freelanceapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -45,7 +46,10 @@ class ClientHomeScreen extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Add functionality to navigate to other screens
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HiringScreen()),
+                );
               },
               child: Text('View Jobs'),
             ),
