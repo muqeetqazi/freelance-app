@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/client/LoginScreen.dart';
-import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
-import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
+import 'package:freelanceapp/Screens/freelancer/SignUpScreen.dart';
+// import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
 import 'package:freelanceapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -161,7 +161,7 @@ class LandingScreen extends StatelessWidget {
     sharedPref.setBool(SplashScreenState.Firstime, false);
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => FreelanceLoginScreen()),
+      MaterialPageRoute(builder: (context) => SignUpScreen()),
     );
   }
 }
