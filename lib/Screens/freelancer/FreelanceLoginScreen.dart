@@ -1,8 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
-import 'package:freelanceapp/Screens/client/clientHomeScreen.dart';
-import 'package:freelanceapp/Screens/landingScreen.dart';
-import 'package:freelanceapp/main.dart';
+import 'package:freelanceapp/Screens/freelancer/FreelancerHomeScreen.dart';
+import 'package:freelanceapp/Screens/freelancer/SignUpScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FreelanceLoginScreen extends StatefulWidget {
@@ -14,15 +13,12 @@ class FreelanceLoginScreen extends StatefulWidget {
 
 class _FreelanceLoginScreenState extends State<FreelanceLoginScreen> {
   String message = "";
-  String password = "";
   String gmail = "";
   bool isPasswordVisible = false;
-  bool isEmailCheck = false;
   Color myColor = const Color(0xFF01696E);
 
   TextEditingController t = TextEditingController();
-  TextEditingController t1 = TextEditingController();
-  var passwords = TextEditingController();
+  TextEditingController passwords = TextEditingController();
 
   bool isEmailFocused = false;
   bool isPasswordFocused = false;
@@ -38,15 +34,6 @@ class _FreelanceLoginScreenState extends State<FreelanceLoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Login'),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LandingScreen()),
-            );
-          },
-        ),
         actions: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -189,21 +176,28 @@ class _FreelanceLoginScreenState extends State<FreelanceLoginScreen> {
   }
 
   void onPressButton() async {
-    var sharedPref = await SharedPreferences.getInstance();
-    sharedPref.setBool(SplashScreenState.KEYLOGIN, true);
     var gmail = t.text.toString();
-    var password = passwords.text.toString();
-    var prefs = await SharedPreferences.getInstance();
-    prefs.setString("gmail", gmail);
-    prefs.setString("password", password);
-    bool isgmailEmpty = t.text.isEmpty;
+    var userPassword = passwords.text.toString();
+    bool isGmailEmpty = t.text.isEmpty;
     bool isPasswordEmpty = passwords.text.isEmpty;
 
-    if (!isgmailEmpty && !isPasswordEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ClientHomeScreen()),
-      );
+    if (!isGmailEmpty && !isPasswordEmpty) {
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(email: gmail, password: userPassword);
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('You are Logged in')));
+        redirectToHomeScreen(context);
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'user-not-found') {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('No user Found with this Email')));
+        } else if (e.code == 'wrong-password') {
+          ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Password did not match')));
+        }
+      }
     } else {
       // Show alert for empty fields
       showDialog(
@@ -211,7 +205,7 @@ class _FreelanceLoginScreenState extends State<FreelanceLoginScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Alert"),
-            content: Text("Please fill in both gmail and password fields."),
+            content: Text("Please fill in both Gmail and Password fields."),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -232,14 +226,22 @@ class _FreelanceLoginScreenState extends State<FreelanceLoginScreen> {
     var getPass = prefs.getString("password");
     setState(() {
       gmail = getgmail ?? '';
-      password = getPass ?? '';
+      // Remove the line below to fix the error
+      // password = getPass ?? '';
     });
   }
 
   void onSignup() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => SignUpScreen()),
+      MaterialPageRoute(builder: (context) => FreelanceSignUpScreen()),
+    );
+  }
+
+  void redirectToHomeScreen(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => FreelancerHomeScreen()),
     );
   }
 }
