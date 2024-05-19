@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:freelanceapp/services/functions/gigFunctions.dart';
 
 class HiringScreen extends StatefulWidget {
   const HiringScreen({Key? key}) : super(key: key);
@@ -8,134 +10,91 @@ class HiringScreen extends StatefulWidget {
 }
 
 class _HiringScreenState extends State<HiringScreen> {
-  int _selectedButtonIndex = 0;
+  String? selectedCategory;
+  String? selectedCategoryName;
+  List<Map<String, String>> categories = [];
+  GigFunction gigFunction = GigFunction();
+  List<DocumentSnapshot> gigs = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    List<DocumentSnapshot> categoryDocs = await GigFunction.getCategories();
+    List<Map<String, String>> loadedCategories = categoryDocs.map((doc) {
+      return {
+        'catId': (doc['catId'] ?? '').toString(),
+        'catNm': (doc['catNm'] ?? '').toString(),
+      };
+    }).toList();
+
+    setState(() {
+      categories = loadedCategories;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hiring'),
+        title: Text('Hiring Screen'),
       ),
       body: Column(
         children: [
-          // Navbar with buttons/options
-          Container(
-            padding: const EdgeInsets.all(8.0),
-            color: const Color(0xFF01696E),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildNavbarButton('Delivery', 0),
-                _buildNavbarButton('Rider', 1),
-                _buildNavbarButton('Cook', 2),
-                // Add more buttons as needed
-              ],
-            ),
+          DropdownButtonFormField<String>(
+            value: selectedCategory,
+            hint: Text('Select Category'),
+            items: [
+              DropdownMenuItem(
+                value: null,
+                child: Text('Select Category'),
+              ),
+              ...categories.map((category) {
+                return DropdownMenuItem<String>(
+                  value: category['catId']!,
+                  child: Text(category['catNm']!),
+                );
+              }).toList(),
+            ],
+            onChanged: (value) async {
+              setState(() {
+                selectedCategory = value;
+                selectedCategoryName = categories.firstWhere(
+                    (category) => category['catId'] == value)?['catNm'];
+              });
+              if (selectedCategory != null && selectedCategory!.isNotEmpty) {
+                gigs = await gigFunction.fetchGigsByCategory(selectedCategory!);
+                setState(() {}); // Update the state to rebuild the widget
+              }
+            },
           ),
-
-          // Spacer
-          SizedBox(height: 10),
-          // List of cards with gigs
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.all(8.0),
-              itemCount:
-                  3, // Assuming you have 3 categories (Delivery, Rider, Cook)
-              separatorBuilder: (context, index) => SizedBox(height: 10),
-              itemBuilder: (context, index) {
-                if (index == _selectedButtonIndex) {
-                  // Load cards based on the selected button
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Card(
+            child: gigs.isEmpty
+                ? Center(
+                    child: Text('No gigs available for the selected category'),
+                  )
+                : ListView.builder(
+                    itemCount: gigs.length,
+                    itemBuilder: (context, index) {
+                      return Card(
                         child: ListTile(
-                          title: Text('Gig Title 1'),
-                          subtitle: Text('Description of the gig 1'),
+                          title: Text(selectedCategoryName ?? ''),
+                          subtitle: Text(gigs[index]['gigDescription'] ?? ''),
                           trailing: ElevatedButton(
                             onPressed: () {
-                              // Add functionality to hire for this gig
+                              // Implement hire functionality
                             },
                             child: Text('Hire Me'),
                           ),
                         ),
-                      ),
-                      Card(
-                        child: ListTile(
-                          title: Text('Gig Title 2'),
-                          subtitle: Text('Description of the gig 2'),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              // Add functionality to hire for this gig
-                            },
-                            child: Text('Hire Me'),
-                          ),
-                        ),
-                      ),
-                      Card(
-                        child: ListTile(
-                          title: Text('Gig Title 3'),
-                          subtitle: Text('Description of the gig 3'),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              // Add functionality to hire for this gig
-                            },
-                            child: Text('Hire Me'),
-                          ),
-                        ),
-                      ),
-                      Card(
-                        child: ListTile(
-                          title: Text('Gig Title 4'),
-                          subtitle: Text('Description of the gig 4'),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              // Add functionality to hire for this gig
-                            },
-                            child: Text('Hire Me'),
-                          ),
-                        ),
-                      ),
-                      // Add more cards as needed
-                    ],
-                  );
-                } else {
-                  // Return an empty container for non-selected categories
-                  return Container();
-                }
-              },
-            ),
+                      );
+                    },
+                  ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildNavbarButton(String text, int index) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: MaterialButton(
-        onPressed: () {
-          setState(() {
-            _selectedButtonIndex = index;
-          });
-        },
-        color: _selectedButtonIndex == index
-            ? Colors.blue
-            : const Color(0xFF01696E),
-        hoverColor: Colors.blue.withOpacity(0.2),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          // side: BorderSide(color: Colors.blue),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            color: _selectedButtonIndex == index
-                ? Colors.white
-                : const Color.fromARGB(255, 255, 255, 255),
-          ),
-        ),
       ),
     );
   }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:freelanceapp/Screens/client/LoginScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/SignUpScreen.dart';
-// import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
+import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
 import 'package:freelanceapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -115,10 +114,7 @@ class LandingScreen extends StatelessWidget {
             SizedBox(height: 20),
             GestureDetector(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SignUpScreen()),
-                );
+                Navigator.pushNamed(context, '/freelancerSignUp');
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -150,18 +146,12 @@ class LandingScreen extends StatelessWidget {
   void _onClient(BuildContext context) async {
     var sharedPref = await SharedPreferences.getInstance();
     sharedPref.setBool(SplashScreenState.Firstime, false);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-    );
+    Navigator.pushNamed(context, '/clientSignUp');
   }
 
   void _onFreelancer(BuildContext context) async {
     var sharedPref = await SharedPreferences.getInstance();
     sharedPref.setBool(SplashScreenState.Firstime, false);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => SignUpScreen()),
-    );
+    Navigator.pushNamed(context, '/freelancerSignUp');
   }
 }
