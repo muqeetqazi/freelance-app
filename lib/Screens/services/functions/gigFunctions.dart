@@ -36,6 +36,17 @@ class GigFunction {
     }
   }
 
+  static Future<List<DocumentSnapshot>> fetchAllGigs() async {
+    try {
+      QuerySnapshot querySnapshot =
+          await FirebaseFirestore.instance.collection('gigs').get();
+      return querySnapshot.docs;
+    } catch (e) {
+      print('Error fetching all gigs: $e');
+      return [];
+    }
+  }
+
   static Future<bool> createGig(
     String categoryId,
     String description,
@@ -51,12 +62,7 @@ class GigFunction {
     try {
       DocumentReference gigRef = FirebaseFirestore.instance
           .collection('gigs')
-          .doc(userEmail); // Using userEmail as document ID
-      DocumentSnapshot gigSnapshot = await gigRef.get();
-      if (gigSnapshot.exists) {
-        // Gig already exists for this user
-        return false;
-      }
+          .doc(); // Automatically generates unique ID
 
       await gigRef.set({
         'available': isAvailable,

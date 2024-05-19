@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelancerHomeScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/SignUpScreen.dart';
+import 'package:freelanceapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FreelanceLoginScreen extends StatefulWidget {
@@ -180,7 +181,8 @@ class _FreelanceLoginScreenState extends State<FreelanceLoginScreen> {
     var userPassword = passwords.text.toString();
     bool isGmailEmpty = t.text.isEmpty;
     bool isPasswordEmpty = passwords.text.isEmpty;
-
+    var sharedPref = await SharedPreferences.getInstance();
+    sharedPref.setBool(SplashScreenState.KEYLOGIN, true);
     if (!isGmailEmpty && !isPasswordEmpty) {
       try {
         UserCredential userCredential = await FirebaseAuth.instance
@@ -190,6 +192,8 @@ class _FreelanceLoginScreenState extends State<FreelanceLoginScreen> {
             .showSnackBar(const SnackBar(content: Text('You are Logged in')));
         // Store email in SharedPreferences upon successful login
         storeUserEmail(gmail);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool(SplashScreenState.isFreelancerLogin, true);
         redirectToHomeScreen(context);
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {

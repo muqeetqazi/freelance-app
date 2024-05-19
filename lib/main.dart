@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelanceapp/Screens/client/LoginScreen.dart';
 import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
+import 'package:freelanceapp/Screens/client/clientHomeScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
+import 'package:freelanceapp/Screens/freelancer/freelancerHomeScreen.dart';
 import 'package:freelanceapp/Screens/landingScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,6 +49,8 @@ class SplashScreen extends StatefulWidget {
 class SplashScreenState extends State<SplashScreen> {
   static const String KEYLOGIN = "";
   static const String Firstime = "";
+  static const String isClientLogin = "";
+  static const String isFreelancerLogin = "";
   Color myColor = const Color(0xFF01696E);
 
   @override
@@ -86,25 +90,26 @@ class SplashScreenState extends State<SplashScreen> {
   void wheretogo() async {
     var SharePref = await SharedPreferences.getInstance();
     var isLoggin = SharePref.getBool(KEYLOGIN);
-    // var isFirstLogin = SharePref.get(KEYFIRST);
+    var isClient = SharePref.get(isClientLogin);
+    var isFreelance = SharePref.get(isFreelancerLogin);
     var isFirstLogin = SharePref.getBool(Firstime);
     Timer(Duration(seconds: 4), () {
-      /* 
       if (isFirstLogin == null) {
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => LandingScreen()));
-      } else {
-        if (isLoggin != null && isLoggin) {
+      } else if (isFirstLogin != null) {
+        if (isLoggin != null && isLoggin && isClientLogin == true) {
           Navigator.of(context).pushReplacement(
               MaterialPageRoute(builder: (context) => ClientHomeScreen()));
+        }
+        if (isLoggin != null && isLoggin && isFreelance == true) {
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => FreelancerHomeScreen()));
         } else {
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => LoginScreen()));
+              MaterialPageRoute(builder: (context) => LandingScreen()));
         }
       }
-      */
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => LandingScreen()));
     });
   }
 }

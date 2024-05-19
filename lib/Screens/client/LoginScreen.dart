@@ -192,6 +192,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void onPressButton() async {
     var sharedPref = await SharedPreferences.getInstance();
     sharedPref.setBool(SplashScreenState.KEYLOGIN, true);
+    SharedPreferences prefss = await SharedPreferences.getInstance();
+    prefss.setBool(SplashScreenState.isClientLogin, true);
     var gmail = t.text.toString();
     var password = passwords.text.toString();
     var prefs = await SharedPreferences.getInstance();

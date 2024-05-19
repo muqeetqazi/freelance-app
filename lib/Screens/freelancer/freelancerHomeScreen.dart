@@ -3,6 +3,8 @@ import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelancerProfileScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/creategig.dart';
 import 'package:freelanceapp/Screens/freelancer/myGigs.dart';
+import 'package:freelanceapp/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -192,16 +194,20 @@ class SideDrawer extends StatelessWidget {
             leading: Icon(Icons.logout),
             title: Text('Log Out'),
             onTap: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => FreelanceLoginScreen()));
+              onLogOut(context);
             },
           ),
         ],
       ),
     );
   }
+}
+
+void onLogOut(BuildContext context) async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setBool(SplashScreenState.isFreelancerLogin, false);
+  Navigator.pushReplacement(
+      context, MaterialPageRoute(builder: (context) => FreelanceLoginScreen()));
 }
 
 class ProjectsScreen extends StatelessWidget {
