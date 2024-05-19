@@ -188,6 +188,8 @@ class _FreelanceLoginScreenState extends State<FreelanceLoginScreen> {
 
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text('You are Logged in')));
+        // Store email in SharedPreferences upon successful login
+        storeUserEmail(gmail);
         redirectToHomeScreen(context);
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
@@ -218,6 +220,11 @@ class _FreelanceLoginScreenState extends State<FreelanceLoginScreen> {
         },
       );
     }
+  }
+
+  void storeUserEmail(String email) async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setString('userEmail', email);
   }
 
   void getValue() async {

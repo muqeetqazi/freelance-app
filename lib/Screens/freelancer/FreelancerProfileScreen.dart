@@ -1,105 +1,60 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:freelanceapp/Screens/freelancer/EditProfileScreen.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FreelancerProfileScreen extends StatefulWidget {
   @override
-  FreelancerProfileScreenState createState() => FreelancerProfileScreenState();
+  _FreelancerProfileScreenState createState() =>
+      _FreelancerProfileScreenState();
 }
 
-class FreelancerProfileScreenState extends State<FreelancerProfileScreen> {
-  final User? user = FirebaseAuth.instance.currentUser;
+class _FreelancerProfileScreenState extends State<FreelancerProfileScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final User? _user = FirebaseAuth.instance.currentUser;
 
-  File? _image;
-  final ImagePicker picker = ImagePicker();
+  TextEditingController _firstNameController = TextEditingController();
+  TextEditingController _lastNameController = TextEditingController();
+  TextEditingController _phoneNumberController = TextEditingController();
+  TextEditingController _oldPasswordController = TextEditingController();
+  TextEditingController _newPasswordController = TextEditingController();
+  TextEditingController _confirmNewPasswordController = TextEditingController();
 
-  String firstName = '';
-  String lastName = '';
-  String email = '';
-  String? profilePictureUrl;
+  String _email = '';
+  String _firstName = '';
+  String _lastName = '';
+  String _phoneNumber = '';
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadUserData();
+    _fetchUserData();
   }
 
-  Future<void> _loadUserData() async {
-    if (user != null) {
+  Future<void> _fetchUserData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userEmail = prefs
+        .getString('userEmail'); // Retrieve user email from SharedPreferences
+
+    if (userEmail != null && userEmail.isNotEmpty) {
       DocumentSnapshot userData =
-          await _firestore.collection('users').doc(user!.uid).get();
+          await _firestore.collection('users').doc(userEmail).get();
 
-      if (userData.exists) {
-        setState(() {
-          try {
-            firstName = userData.get('firstName') ?? '';
-          } catch (e) {
-            print('Field "firstName" does not exist in the document: $e');
-          }
+      setState(() {
+        _email = userData.get('email') ?? '';
+        _firstName = userData.get('firstName') ?? '';
+        _lastName = userData.get('lastName') ?? '';
+        _phoneNumber = userData.get('phoneNumber') ?? '';
+        _isLoading = false;
 
-          try {
-            lastName = userData.get('lastName') ?? '';
-          } catch (e) {
-            print('Field "lastName" does not exist in the document: $e');
-          }
-
-          try {
-            email = userData.get('email') ?? '';
-          } catch (e) {
-            print('Field "email" does not exist in the document: $e');
-          }
-
-          try {
-            profilePictureUrl = userData.get('profilePicture') ?? null;
-          } catch (e) {
-            print('Field "profilePicture" does not exist in the document: $e');
-          }
-        });
-      } else {
-        // Handle the case where the document does not exist
-        print('User document does not exist');
-        setState(() {
-          firstName = '';
-          lastName = '';
-          email = '';
-        });
-      }
-    }
-  }
-
-  Future<void> getImage() async {
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      File imageFile = File(pickedFile.path);
-
-      // Uploading the image to Firebase Storage
-      try {
-        String fileName = 'profile_pictures/${user!.uid}.png';
-        await FirebaseStorage.instance.ref(fileName).putFile(imageFile);
-        String downloadURL =
-            await FirebaseStorage.instance.ref(fileName).getDownloadURL();
-
-        // Saving the download URL to Firestore
-        setState(() {
-          _image = imageFile;
-          profilePictureUrl = downloadURL;
-        });
-
-        await _firestore.collection('users').doc(user!.uid).update({
-          'profilePicture': downloadURL,
-        });
-      } catch (e) {
-        print('Error uploading image: $e');
-      }
+        // Set the initial values for the controllers
+        _firstNameController.text = _firstName;
+        _lastNameController.text = _lastName;
+        _phoneNumberController.text = _phoneNumber;
+      });
     } else {
-      print('No image selected.');
+      print('User email not found in SharedPreferences.');
     }
   }
 
@@ -108,83 +63,160 @@ class FreelancerProfileScreenState extends State<FreelancerProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Freelancer Profile'),
-        backgroundColor: Colors.deepPurple,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: GestureDetector(
-                onTap: getImage,
-                child: CircleAvatar(
-                  radius: 50,
-                  backgroundImage: _image != null
-                      ? FileImage(_image!)
-                      : profilePictureUrl != null
-                          ? NetworkImage(profilePictureUrl!) as ImageProvider
-                          : AssetImage('assets/default_profile.png'),
-                  child: _image == null && profilePictureUrl == null
-                      ? Icon(Icons.add_a_photo, size: 50, color: Colors.white70)
-                      : null, // Show add photo icon if no image selected
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Center(
-              child: Text(
-                '$firstName $lastName',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                ),
-              ),
-            ),
-            Center(
-              child: Text(
-                email,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[700],
-                ),
-              ),
-            ),
-            SizedBox(height: 30),
-            Divider(
-              thickness: 1,
-              color: Colors.grey[300],
-            ),
-            SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditProfileScreen(
-                      firstName: firstName,
-                      lastName: lastName,
-                      email: email,
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Text(
+                          'Email:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ).then((_) => _loadUserData()); // Refresh data on return
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                padding: EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                    SizedBox(height: 5),
+                    Text(
+                      _email,
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 20),
+                    _buildTextField(
+                      controller: _firstNameController,
+                      labelText: 'First Name',
+                      prefixIcon: Icons.person,
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _lastNameController,
+                      labelText: 'Last Name',
+                      prefixIcon: Icons.person,
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _phoneNumberController,
+                      labelText: 'Phone Number',
+                      prefixIcon: Icons.phone,
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _saveChanges,
+                      child: Text('Save Changes'),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Change Password',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _oldPasswordController,
+                      labelText: 'Old Password',
+                      prefixIcon: Icons.lock,
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _newPasswordController,
+                      labelText: 'New Password',
+                      prefixIcon: Icons.lock,
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 10),
+                    _buildTextField(
+                      controller: _confirmNewPasswordController,
+                      labelText: 'Confirm New Password',
+                      prefixIcon: Icons.lock,
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: _changePassword,
+                      child: Text('Change Password'),
+                    ),
+                  ],
                 ),
               ),
-              child: Text(
-                'Edit Your Profile',
-                style: TextStyle(fontSize: 16),
-              ),
             ),
-          ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    IconData? prefixIcon,
+    bool obscureText = false,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.0),
         ),
+        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
       ),
     );
+  }
+
+  void _saveChanges() async {
+    // Save changes to Firestore
+    await _firestore.collection('users').doc(_email).update({
+      'firstName': _firstNameController.text,
+      'lastName': _lastNameController.text,
+      'phoneNumber': _phoneNumberController.text,
+    });
+
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Changes saved successfully')),
+    );
+  }
+
+  void _changePassword() async {
+    String oldPassword = _oldPasswordController.text;
+    String newPassword = _newPasswordController.text;
+    String confirmNewPassword = _confirmNewPasswordController.text;
+
+    if (newPassword != confirmNewPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('New passwords do not match')),
+      );
+      return;
+    }
+
+    try {
+      await _user?.reauthenticateWithCredential(
+        EmailAuthProvider.credential(
+          email: _user!.email!,
+          password: oldPassword,
+        ),
+      );
+      await _user?.updatePassword(newPassword);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Password changed successfully')),
+      );
+      // Clear the password fields after successful password change
+      _oldPasswordController.clear();
+      _newPasswordController.clear();
+      _confirmNewPasswordController.clear();
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error changing password: ${e.message}')),
+      );
+    }
   }
 }

@@ -6,7 +6,6 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelanceapp/Screens/client/LoginScreen.dart';
 import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
-import 'package:freelanceapp/Screens/freelancer/FreelancerProfileScreen.dart';
 import 'package:freelanceapp/Screens/landingScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,7 +28,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         "/client/LoginScreen": (context) => LoginScreen(),
-        "/client/SignUpScreen": (context) => SignUpScreen(),
+        "/client/SignUpScreen": (context) => ClientSignUpScreen(),
         "/landingScreen": (context) => LandingScreen(),
         "/FreelanceLoginScreen": (context) => FreelanceLoginScreen(),
       },
@@ -105,7 +104,7 @@ class SplashScreenState extends State<SplashScreen> {
       }
       */
       Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => FreelancerProfileScreen()));
+          MaterialPageRoute(builder: (context) => LandingScreen()));
     });
   }
 }

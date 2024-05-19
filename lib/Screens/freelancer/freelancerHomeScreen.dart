@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
-import 'package:freelanceapp/Screens/freelancer/FreelanceProject.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelancerProfileScreen.dart';
+import 'package:freelanceapp/Screens/freelancer/creategig.dart';
+import 'package:freelanceapp/Screens/freelancer/myGigs.dart';
 
 void main() {
   runApp(const MyApp());
@@ -99,6 +100,40 @@ class FreelancerHomeScreen extends StatelessWidget {
               ),
               child: Text('Log Out'),
             ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreateGigScreen()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 15),
+                textStyle: TextStyle(fontSize: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text('Create Gigs'),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyGigsScreen()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 15),
+                textStyle: TextStyle(fontSize: 18),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: Text('View Gigs'),
+            ),
           ],
         ),
       ),
@@ -154,7 +189,7 @@ class SideDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: Icon(Icons.exit_to_app),
+            leading: Icon(Icons.logout),
             title: Text('Log Out'),
             onTap: () {
               Navigator.pushReplacement(
@@ -164,6 +199,23 @@ class SideDrawer extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ProjectsScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Projects'),
+      ),
+      body: Center(
+        child: Text(
+          'Projects Screen',
+          style: TextStyle(fontSize: 24),
+        ),
       ),
     );
   }

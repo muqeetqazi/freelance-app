@@ -4,6 +4,7 @@ class FirebaseFunctions {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<void> signUpUser({
+    required String userId, // Document ID (Gmail address)
     required String firstName,
     required String lastName,
     required String username,
@@ -12,7 +13,7 @@ class FirebaseFunctions {
     required String phoneNumber,
   }) async {
     try {
-      await _firestore.collection('users').add({
+      await _firestore.collection('users').doc(userId).set({
         'firstName': firstName,
         'lastName': lastName,
         'username': username,

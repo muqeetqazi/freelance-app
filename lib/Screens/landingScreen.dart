@@ -117,7 +117,7 @@ class LandingScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SignUpScreen()),
+                  MaterialPageRoute(builder: (context) => ClientSignUpScreen()),
                 );
               },
               child: Row(
