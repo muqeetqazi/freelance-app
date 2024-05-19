@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 import 'package:flutter/material.dart';
+import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
 import 'package:freelanceapp/Screens/services/functions/authFunctions.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FreelanceSignUpScreen extends StatefulWidget {
   const FreelanceSignUpScreen({Key? key}) : super(key: key);
@@ -20,9 +23,10 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
 
   bool _agreeToTerms = false;
 
-  void _signUp() {
+  void _signUp() async {
     if (_formKey.currentState!.validate() && _agreeToTerms) {
-      AuthServices.signupUser(
+      // Sign up the user
+      var user = await AuthServices.signupUser(
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         username: _usernameController.text,
@@ -31,18 +35,37 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
         phoneNumber: _phoneNumberController.text,
         context: context,
       );
+
+      if (user != null) {
+        await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+          'firstName': _firstNameController.text,
+          'lastName': _lastNameController.text,
+          'username': _usernameController.text,
+          'email': _emailController.text,
+          'phoneNumber': _phoneNumberController.text,
+        });
+        storeUserId(user.id);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => FreelanceLoginScreen()),
+        );
+      }
     }
+  }
+
+  void storeUserId(String userId) async {
+    var prefs = await SharedPreferences.getInstance();
+    prefs.setString('userId', userId);
   }
 
   @override
   Widget build(BuildContext context) {
     Color myColor = const Color(0xFF01696E);
-    bool isEmailFocused = false;
-    bool isPasswordFocused = false;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sign Up'),
+        backgroundColor: myColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -54,7 +77,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: TextField(
+                      child: TextFormField(
                         controller: _firstNameController,
                         decoration: InputDecoration(
                           labelText: 'First Name',
@@ -62,7 +85,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                           prefixIcon: Icon(Icons.person),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: isEmailFocused ? myColor : Colors.black,
+                              color: Colors.black,
                               width: 2.0,
                             ),
                             borderRadius: BorderRadius.circular(15),
@@ -79,7 +102,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                     ),
                     SizedBox(width: 10),
                     Expanded(
-                      child: TextField(
+                      child: TextFormField(
                         controller: _lastNameController,
                         decoration: InputDecoration(
                           labelText: 'Last Name',
@@ -87,7 +110,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                           prefixIcon: Icon(Icons.person),
                           enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: isEmailFocused ? myColor : Colors.black,
+                              color: Colors.black,
                               width: 2.0,
                             ),
                             borderRadius: BorderRadius.circular(15),
@@ -105,7 +128,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                   ],
                 ),
                 SizedBox(height: 20),
-                TextField(
+                TextFormField(
                   controller: _usernameController,
                   decoration: InputDecoration(
                     labelText: 'Username',
@@ -113,7 +136,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                     prefixIcon: Icon(Icons.account_circle),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: isEmailFocused ? myColor : Colors.black,
+                        color: Colors.black,
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(15),
@@ -128,7 +151,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                TextField(
+                TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email',
@@ -136,7 +159,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                     prefixIcon: Icon(Icons.email),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: isEmailFocused ? myColor : Colors.black,
+                        color: Colors.black,
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(15),
@@ -151,7 +174,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                TextField(
+                TextFormField(
                   controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
@@ -160,7 +183,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                     prefixIcon: Icon(Icons.lock),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: isPasswordFocused ? myColor : Colors.black,
+                        color: Colors.black,
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(15),
@@ -175,7 +198,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                TextField(
+                TextFormField(
                   controller: _phoneNumberController,
                   decoration: InputDecoration(
                     labelText: 'Phone Number',
@@ -183,7 +206,7 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                     prefixIcon: Icon(Icons.phone),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: isPasswordFocused ? myColor : Colors.black,
+                        color: Colors.black,
                         width: 2.0,
                       ),
                       borderRadius: BorderRadius.circular(15),
@@ -214,6 +237,14 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _signUp,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: myColor,
+                    shadowColor: Colors.white,
+                    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
                   child: Text('Create Account'),
                 ),
                 SizedBox(height: 20),
@@ -223,16 +254,39 @@ class SignUpScreenState extends State<FreelanceSignUpScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.facebook),
+                      icon: Icon(Icons.facebook, color: myColor),
                       onPressed: () {
                         // Handle Facebook login
                       },
                     ),
                     IconButton(
-                      icon: Icon(Icons.g_mobiledata),
+                      icon: Icon(Icons.g_mobiledata, color: myColor),
                       onPressed: () {
                         // Handle Google login
                       },
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Do you already have an account?'),
+                    SizedBox(width: 5),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => FreelanceLoginScreen()));
+                      },
+                      child: Text(
+                        'Login',
+                        style: TextStyle(
+                          color: myColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
