@@ -1,3 +1,9 @@
+// screen detail: es screen pa freelancer ki jo gigs firebase pa pari wo show hoti
+// wo chahy to unha deactivate ya delete kr skta
+// deactivate krna pa database ma status false ho jata false status wali gig client side pr nazar nae ayengi
+// ya screen freelancer side pa 'My Gigs' button bna kr dikha daye uspa
+// eska bhi UI behter krna ko dil krey to bismillah
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/services/functions/gigFunctions.dart';
@@ -8,8 +14,7 @@ class MyGigsScreen extends StatefulWidget {
 }
 
 class _MyGigsScreenState extends State<MyGigsScreen> {
-  List<DocumentSnapshot> gigs = [];
-  bool isLoading = true;
+  late List<DocumentSnapshot> gigs;
 
   @override
   void initState() {
@@ -18,18 +23,10 @@ class _MyGigsScreenState extends State<MyGigsScreen> {
   }
 
   Future<void> fetchGigs() async {
-    try {
-      List<DocumentSnapshot> result = await GigFunction.getGigsForUser();
-      setState(() {
-        gigs = result;
-        isLoading = false;
-      });
-    } catch (e) {
-      print('Error fetching gigs: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
+    List<DocumentSnapshot> result = await GigFunction.getGigsForUser();
+    setState(() {
+      gigs = result;
+    });
   }
 
   @override
@@ -38,62 +35,60 @@ class _MyGigsScreenState extends State<MyGigsScreen> {
       appBar: AppBar(
         title: Text('My Gigs'),
       ),
-      body: isLoading
+      body: gigs == null
           ? Center(child: CircularProgressIndicator())
-          : gigs.isEmpty
-              ? Center(child: Text('No gigs found.'))
-              : ListView.builder(
-                  itemCount: gigs.length,
-                  itemBuilder: (context, index) {
-                    var gig = gigs[index];
-                    return Card(
-                      child: ListTile(
-                        title: FutureBuilder(
-                          future: FirebaseFirestore.instance
-                              .collection('categories')
-                              .where('catId', isEqualTo: gig['catId'])
-                              .get(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasError) {
-                              return Text("Error");
-                            }
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Text("Loading...");
-                            }
-                            if (snapshot.data!.docs.isEmpty) {
-                              return Text("Category Not Found");
-                            }
-                            var catName = snapshot.data!.docs[0]['catNm'];
-                            return Text(catName);
+          : ListView.builder(
+              itemCount: gigs.length,
+              itemBuilder: (context, index) {
+                var gig = gigs[index];
+                return Card(
+                  child: ListTile(
+                    title: FutureBuilder(
+                      future: FirebaseFirestore.instance
+                          .collection('categories')
+                          .where('catId', isEqualTo: gig['catId'])
+                          .get(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.hasError) {
+                          return Text("Error");
+                        }
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Text("Loading");
+                        }
+                        if (snapshot.data!.docs.isEmpty) {
+                          return Text("Category Not Found");
+                        }
+                        var catName = snapshot.data!.docs[0]['catNm'];
+                        return Text(catName);
+                      },
+                    ),
+                    subtitle: Text(gig['gigDescription']),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Switch(
+                          value: gig['available'],
+                          onChanged: (value) async {
+                            await GigFunction.updateGigAvailability(
+                                gig.id, value);
+                            fetchGigs();
                           },
                         ),
-                        subtitle: Text(gig['gigDescription']),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Switch(
-                              value: gig['available'],
-                              onChanged: (value) async {
-                                await GigFunction.updateGigAvailability(
-                                    gig.id, value);
-                                fetchGigs();
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () async {
-                                await GigFunction.deleteGig(gig.id);
-                                fetchGigs();
-                              },
-                            ),
-                          ],
+                        IconButton(
+                          icon: Icon(Icons.delete),
+                          onPressed: () async {
+                            await GigFunction.deleteGig(gig.id);
+                            fetchGigs();
+                          },
                         ),
-                      ),
-                    );
-                  },
-                ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

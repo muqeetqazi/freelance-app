@@ -88,23 +88,6 @@ class FreelancerHomeScreen extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => FreelanceLoginScreen()));
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: 15),
-                textStyle: TextStyle(fontSize: 18),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-              ),
-              child: Text('Log Out'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => CreateGigScreen()),

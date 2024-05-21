@@ -149,7 +149,9 @@ class LandingScreen extends StatelessWidget {
 
   void _onClient(BuildContext context) async {
     var sharedPref = await SharedPreferences.getInstance();
-    sharedPref.setBool(SplashScreenState.Firstime, false);
+    sharedPref.setBool(SplashScreenState.Firstime, true);
+    sharedPref.setBool(SplashScreenState.isClientEntry, true);
+
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -158,7 +160,8 @@ class LandingScreen extends StatelessWidget {
 
   void _onFreelancer(BuildContext context) async {
     var sharedPref = await SharedPreferences.getInstance();
-    sharedPref.setBool(SplashScreenState.Firstime, false);
+    sharedPref.setBool(SplashScreenState.Firstime, true);
+    sharedPref.setBool(SplashScreenState.isFreelanceEntry, true);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => FreelanceLoginScreen()),

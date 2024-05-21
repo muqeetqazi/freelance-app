@@ -7,6 +7,7 @@ import 'package:freelanceapp/Screens/client/LoginScreen.dart';
 import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
 import 'package:freelanceapp/Screens/client/clientHomeScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
+import 'package:freelanceapp/Screens/freelancer/SignUpScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/freelancerHomeScreen.dart';
 import 'package:freelanceapp/Screens/landingScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +33,11 @@ class MyApp extends StatelessWidget {
         "/client/LoginScreen": (context) => LoginScreen(),
         "/client/SignUpScreen": (context) => ClientSignUpScreen(),
         "/landingScreen": (context) => LandingScreen(),
-        "/FreelanceLoginScreen": (context) => FreelanceLoginScreen(),
+        "/freelancer/FreelanceLoginScreen": (context) => FreelanceLoginScreen(),
+        "/freelancer/FreelanceSignUpScreen": (context) =>
+            FreelanceSignUpScreen(),
+        "/freelancer/FreelancerHomeScreen": (context) => FreelancerHomeScreen(),
+        "/client/ClientHomeScreen": (context) => ClientHomeScreen(),
       },
       home: const SplashScreen(),
     );
@@ -47,9 +52,10 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-  static const String KEYLOGIN = "";
   static const String Firstime = "";
   static const String isClientLogin = "";
+  static const String isClientEntry = "";
+  static const String isFreelanceEntry = "";
   static const String isFreelancerLogin = "";
   Color myColor = const Color(0xFF01696E);
 
@@ -73,9 +79,7 @@ class SplashScreenState extends State<SplashScreen> {
               width: 400,
               height: 400,
             ),
-            SizedBox(
-                height:
-                    0), // Add some space between the image and the loading animation
+            SizedBox(height: 0),
             SpinKitWave(
               // Use SpinKitWave from the package
               color: myColor, // Set the color of the animation
@@ -89,25 +93,66 @@ class SplashScreenState extends State<SplashScreen> {
 
   void wheretogo() async {
     var SharePref = await SharedPreferences.getInstance();
-    var isLoggin = SharePref.getBool(KEYLOGIN);
-    var isClient = SharePref.get(isClientLogin);
-    var isFreelance = SharePref.get(isFreelancerLogin);
+    var isClient = SharePref.getBool(isClientLogin);
+    var isFreelanceEntryval = SharePref.getBool(isFreelanceEntry);
+    var isClientEntryVal = SharePref.getBool(isClientEntry);
+    var isFreelance = SharePref.getBool(isFreelancerLogin);
     var isFirstLogin = SharePref.getBool(Firstime);
     Timer(Duration(seconds: 4), () {
-      if (isFirstLogin == null) {
+      /*
+      if (isFirstLogin == null || isFirstLogin == false) {
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => LandingScreen()));
-      } else if (isFirstLogin != null) {
-        if (isLoggin != null && isLoggin && isClientLogin == true) {
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => ClientHomeScreen()));
+      }
+      if (isFirstLogin == true) {
+        if (isClientEntryVal == true) {
+          if (isClient == true) {
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => ClientHomeScreen()));
+          } else {
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => LoginScreen()));
+          }
         }
-        if (isLoggin != null && isLoggin && isFreelance == true) {
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => FreelancerHomeScreen()));
-        } else {
-          Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => LandingScreen()));
+        if (isFreelanceEntryval == true) {
+          if (isFreelance == true) {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => FreelancerHomeScreen()));
+          } else {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => FreelanceLoginScreen()));
+          }
+        }
+      }
+    */
+      if (isFirstLogin == null || isFirstLogin == false) {
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => LandingScreen()));
+      }
+      if (isFirstLogin == true) {
+        if (isClientEntryVal == true) {
+          if (isClient == true) {
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => ClientHomeScreen()));
+          } else {
+            Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => LoginScreen()));
+          }
+        }
+        if (isFreelanceEntryval == true) {
+          if (isFreelance == true &&
+              isFreelance != false &&
+              isFreelance != null) {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FreelancerHomeScreen()));
+          } else {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => FreelanceLoginScreen()));
+          }
         }
       }
     });

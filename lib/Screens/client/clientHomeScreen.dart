@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/client/HiringScreen.dart';
 import 'package:freelanceapp/Screens/client/LoginScreen.dart';
+import 'package:freelanceapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -131,11 +132,8 @@ class ClientHomeScreen extends StatelessWidget {
 
   void onClickLogout(BuildContext context) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setBool('isLoggedIn', false);
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-      (route) => false,
-    );
+    prefs.setBool(SplashScreenState.isClientLogin, false);
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => LoginScreen()));
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class ProjectsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Dummy project data for demonstration
     final List<Project> projects = [
       Project(
         title: "Mobile App Development",

@@ -79,10 +79,12 @@ class GigFunction {
   }
 
   static Future<List<DocumentSnapshot>> getGigsForUser() async {
-    String userId = FirebaseAuth.instance.currentUser!.uid;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userEmail = prefs.getString('userEmail');
+    String userId = FirebaseAuth.instance.currentUser!.uid; // Corrected
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('gigs')
-        .where('userId', isEqualTo: userId)
+        .where('userId', isEqualTo: userId) // Filter by current user's email
         .get();
     return querySnapshot.docs;
   }
