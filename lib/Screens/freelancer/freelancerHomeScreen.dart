@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelanceLoginScreen.dart';
+import 'package:freelanceapp/Screens/freelancer/FreelanceProject.dart';
 import 'package:freelanceapp/Screens/freelancer/FreelancerProfileScreen.dart';
 import 'package:freelanceapp/Screens/freelancer/creategig.dart';
 import 'package:freelanceapp/Screens/freelancer/myGigs.dart';
@@ -9,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   runApp(const MyApp());
 }
+
+Color myColor = const Color(0xFF01696E);
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -33,6 +36,7 @@ class FreelancerHomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Freelancer Home'),
+        backgroundColor: myColor,
       ),
       drawer: SideDrawer(),
       body: Padding(
@@ -64,8 +68,10 @@ class FreelancerHomeScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
+                backgroundColor: myColor,
               ),
-              child: Text('View Projects'),
+              child:
+                  Text('View Projects', style: TextStyle(color: Colors.white)),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -82,8 +88,10 @@ class FreelancerHomeScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
+                backgroundColor: myColor,
               ),
-              child: Text('View Profile'),
+              child:
+                  Text('View Profile', style: TextStyle(color: Colors.white)),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -99,8 +107,9 @@ class FreelancerHomeScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
+                backgroundColor: myColor,
               ),
-              child: Text('Create Gigs'),
+              child: Text('Create Gigs', style: TextStyle(color: Colors.white)),
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -116,8 +125,9 @@ class FreelancerHomeScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
+                backgroundColor: myColor,
               ),
-              child: Text('View Gigs'),
+              child: Text('View Gigs', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -135,7 +145,7 @@ class SideDrawer extends StatelessWidget {
         children: <Widget>[
           DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: myColor,
             ),
             child: Text(
               'Menu',
@@ -191,21 +201,4 @@ void onLogOut(BuildContext context) async {
   prefs.setBool(SplashScreenState.isFreelancerLogin, false);
   Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => FreelanceLoginScreen()));
-}
-
-class ProjectsScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Projects'),
-      ),
-      body: Center(
-        child: Text(
-          'Projects Screen',
-          style: TextStyle(fontSize: 24),
-        ),
-      ),
-    );
-  }
 }

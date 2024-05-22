@@ -97,14 +97,13 @@ class SplashScreenState extends State<SplashScreen> {
     var isFreelanceEntryval = SharePref.getBool(isFreelanceEntry);
     var isClientEntryVal = SharePref.getBool(isClientEntry);
     var isFreelance = SharePref.getBool(isFreelancerLogin);
-    var isFirstLogin = SharePref.getBool(Firstime);
+    var isFirstEntry = SharePref.getBool(Firstime);
     Timer(Duration(seconds: 4), () {
-      /*
-      if (isFirstLogin == null || isFirstLogin == false) {
+      if (isFirstEntry == null || isFirstEntry == false) {
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => LandingScreen()));
       }
-      if (isFirstLogin == true) {
+      if (isFirstEntry == true) {
         if (isClientEntryVal == true) {
           if (isClient == true) {
             Navigator.of(context).pushReplacement(
@@ -121,37 +120,6 @@ class SplashScreenState extends State<SplashScreen> {
           } else {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => FreelanceLoginScreen()));
-          }
-        }
-      }
-    */
-      if (isFirstLogin == null || isFirstLogin == false) {
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => LandingScreen()));
-      }
-      if (isFirstLogin == true) {
-        if (isClientEntryVal == true) {
-          if (isClient == true) {
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => ClientHomeScreen()));
-          } else {
-            Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => LoginScreen()));
-          }
-        }
-        if (isFreelanceEntryval == true) {
-          if (isFreelance == true &&
-              isFreelance != false &&
-              isFreelance != null) {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => FreelancerHomeScreen()));
-          } else {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => FreelanceLoginScreen()));
           }
         }
       }

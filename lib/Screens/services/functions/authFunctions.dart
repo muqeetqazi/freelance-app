@@ -16,6 +16,7 @@ class AuthServices {
     required BuildContext context,
   }) async {
     try {
+      //use defualt function kia hn UserCredential ka
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
 

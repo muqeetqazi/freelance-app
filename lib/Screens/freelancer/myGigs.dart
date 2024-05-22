@@ -1,11 +1,6 @@
-// screen detail: es screen pa freelancer ki jo gigs firebase pa pari wo show hoti
-// wo chahy to unha deactivate ya delete kr skta
-// deactivate krna pa database ma status false ho jata false status wali gig client side pr nazar nae ayengi
-// ya screen freelancer side pa 'My Gigs' button bna kr dikha daye uspa
-// eska bhi UI behter krna ko dil krey to bismillah
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelanceapp/Screens/services/functions/gigFunctions.dart';
 
 class MyGigsScreen extends StatefulWidget {
@@ -14,7 +9,9 @@ class MyGigsScreen extends StatefulWidget {
 }
 
 class _MyGigsScreenState extends State<MyGigsScreen> {
-  late List<DocumentSnapshot> gigs;
+  List<DocumentSnapshot> gigs = [];
+  bool isLoading = true;
+  Color myColor = const Color(0xFF01696E);
 
   @override
   void initState() {
@@ -23,10 +20,28 @@ class _MyGigsScreenState extends State<MyGigsScreen> {
   }
 
   Future<void> fetchGigs() async {
-    List<DocumentSnapshot> result = await GigFunction.getGigsForUser();
-    setState(() {
-      gigs = result;
-    });
+    try {
+      List<DocumentSnapshot> result = await GigFunction.getGigsForUser();
+      setState(() {
+        gigs = result;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error fetching gigs: $e')),
+      );
+    }
+  }
+
+  Future<String> getCategoryName(String categoryId) async {
+    try {
+      return await GigFunction().getCategoryName(categoryId);
+    } catch (e) {
+      return 'Category Not Found';
+    }
   }
 
   @override
@@ -34,61 +49,122 @@ class _MyGigsScreenState extends State<MyGigsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('My Gigs'),
+        backgroundColor: myColor,
       ),
-      body: gigs == null
-          ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: gigs.length,
-              itemBuilder: (context, index) {
-                var gig = gigs[index];
-                return Card(
-                  child: ListTile(
-                    title: FutureBuilder(
-                      future: FirebaseFirestore.instance
-                          .collection('categories')
-                          .where('catId', isEqualTo: gig['catId'])
-                          .get(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<QuerySnapshot> snapshot) {
-                        if (snapshot.hasError) {
-                          return Text("Error");
-                        }
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Text("Loading");
-                        }
-                        if (snapshot.data!.docs.isEmpty) {
-                          return Text("Category Not Found");
-                        }
-                        var catName = snapshot.data!.docs[0]['catNm'];
-                        return Text(catName);
-                      },
-                    ),
-                    subtitle: Text(gig['gigDescription']),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Switch(
-                          value: gig['available'],
-                          onChanged: (value) async {
-                            await GigFunction.updateGigAvailability(
-                                gig.id, value);
-                            fetchGigs();
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.delete),
-                          onPressed: () async {
-                            await GigFunction.deleteGig(gig.id);
-                            fetchGigs();
-                          },
-                        ),
-                      ],
-                    ),
+      body: isLoading
+          ? Center(child: SpinKitWave(color: myColor))
+          : gigs.isEmpty
+              ? Center(
+                  child: Text(
+                    'No gigs available',
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
                   ),
-                );
-              },
-            ),
+                )
+              : ListView.builder(
+                  itemCount: gigs.length,
+                  itemBuilder: (context, index) {
+                    var gig = gigs[index];
+                    return Card(
+                      elevation: 5,
+                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              contentPadding: EdgeInsets.all(16),
+                              leading: CircleAvatar(
+                                backgroundColor: myColor,
+                                child: Icon(
+                                  Icons.work,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              title: FutureBuilder<String>(
+                                future: getCategoryName(gig['catId']),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Text("Loading...");
+                                  }
+                                  if (snapshot.hasError) {
+                                    return Text("Error loading category");
+                                  }
+                                  return Text(
+                                    snapshot.data ?? "Category Not Found",
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  );
+                                },
+                              ),
+                              subtitle: Text(
+                                gig['gigDescription'],
+                                style: TextStyle(fontSize: 16),
+                              ),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Switch(
+                                  value: gig['available'],
+                                  onChanged: (value) async {
+                                    await GigFunction.updateGigAvailability(
+                                        gig.id, value);
+                                    fetchGigs();
+                                  },
+                                  activeColor: myColor,
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () async {
+                                    bool confirmed = await showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        title: Text('Delete Gig'),
+                                        content: Text(
+                                            'Are you sure you want to delete this gig?'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context, false),
+                                            child: Text('Cancel'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context, true),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                            child: Text('Delete'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                    if (confirmed) {
+                                      await GigFunction.deleteGig(gig.id);
+                                      fetchGigs();
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }

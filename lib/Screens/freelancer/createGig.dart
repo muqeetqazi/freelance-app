@@ -1,10 +1,3 @@
-// ya screen button: 'Create Gig' freelancer side pa click krna pa show krwa daye
-// bhai es screen ka UI dekh laye agr behtr krna ka dil krey
-// or espa submit ka buttton pr click krna pa essa 'myGigs.dart' pr pohancha daye
-// es screen ki detail: categrory main data firebase sa arha or description or availability status
-// select krka, submit pa click kro to currently logged in user ka liye gigs collection ma data firebase
-// pa store ho jate , userid, ctgID, description or availablity status ka sath
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/services/functions/gigFunctions.dart';
@@ -19,6 +12,7 @@ class _CreateGigScreenState extends State<CreateGigScreen> {
   String description = '';
   bool isAvailable = false;
   List<DocumentSnapshot> categories = [];
+  Color myColor = const Color(0xFF01696E);
 
   @override
   void initState() {
@@ -38,6 +32,7 @@ class _CreateGigScreenState extends State<CreateGigScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Create Gig'),
+        backgroundColor: myColor,
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -91,6 +86,7 @@ class _CreateGigScreenState extends State<CreateGigScreen> {
                       isAvailable = value!;
                     });
                   },
+                  activeColor: myColor,
                 ),
               ],
             ),
@@ -117,8 +113,7 @@ class _CreateGigScreenState extends State<CreateGigScreen> {
                         }
                       },
                 style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all<Color>(Colors.blue),
+                  backgroundColor: MaterialStateProperty.all<Color>(myColor),
                   padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
                     EdgeInsets.symmetric(vertical: 16.0),
                   ),

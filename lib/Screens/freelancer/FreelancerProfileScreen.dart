@@ -25,6 +25,7 @@ class _FreelancerProfileScreenState extends State<FreelancerProfileScreen> {
   String _lastName = '';
   String _phoneNumber = '';
   bool _isLoading = true;
+  Color myColor = const Color(0xFF01696E);
 
   @override
   void initState() {
@@ -63,90 +64,107 @@ class _FreelancerProfileScreenState extends State<FreelancerProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Freelancer Profile'),
+        backgroundColor: myColor,
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Padding(
               padding: EdgeInsets.all(16.0),
               child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 20),
-                    Row(
+                child: Card(
+                  elevation: 5,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Email:',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 5),
                         Text(
-                          'Email:',
+                          _email,
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        SizedBox(height: 20),
+                        _buildTextField(
+                          controller: _firstNameController,
+                          labelText: 'First Name',
+                          prefixIcon: Icons.person,
+                        ),
+                        SizedBox(height: 10),
+                        _buildTextField(
+                          controller: _lastNameController,
+                          labelText: 'Last Name',
+                          prefixIcon: Icons.person,
+                        ),
+                        SizedBox(height: 10),
+                        _buildTextField(
+                          controller: _phoneNumberController,
+                          labelText: 'Phone Number',
+                          prefixIcon: Icons.phone,
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: _saveChanges,
+                          child: Text('Save Changes'),
+                          style: ElevatedButton.styleFrom(
+                            shadowColor: myColor,
+                            backgroundColor: Colors.white, // Text color
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Change Password',
                           style: TextStyle(
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        _buildTextField(
+                          controller: _oldPasswordController,
+                          labelText: 'Old Password',
+                          prefixIcon: Icons.lock,
+                          obscureText: true,
+                        ),
+                        SizedBox(height: 10),
+                        _buildTextField(
+                          controller: _newPasswordController,
+                          labelText: 'New Password',
+                          prefixIcon: Icons.lock,
+                          obscureText: true,
+                        ),
+                        SizedBox(height: 10),
+                        _buildTextField(
+                          controller: _confirmNewPasswordController,
+                          labelText: 'Confirm New Password',
+                          prefixIcon: Icons.lock,
+                          obscureText: true,
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: _changePassword,
+                          child: Text('Change Password'),
+                          style: ElevatedButton.styleFrom(
+                            shadowColor: myColor,
+                            backgroundColor: Colors.white, // Text color
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 5),
-                    Text(
-                      _email,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    SizedBox(height: 20),
-                    _buildTextField(
-                      controller: _firstNameController,
-                      labelText: 'First Name',
-                      prefixIcon: Icons.person,
-                    ),
-                    SizedBox(height: 10),
-                    _buildTextField(
-                      controller: _lastNameController,
-                      labelText: 'Last Name',
-                      prefixIcon: Icons.person,
-                    ),
-                    SizedBox(height: 10),
-                    _buildTextField(
-                      controller: _phoneNumberController,
-                      labelText: 'Phone Number',
-                      prefixIcon: Icons.phone,
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _saveChanges,
-                      child: Text('Save Changes'),
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      'Change Password',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 10),
-                    _buildTextField(
-                      controller: _oldPasswordController,
-                      labelText: 'Old Password',
-                      prefixIcon: Icons.lock,
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 10),
-                    _buildTextField(
-                      controller: _newPasswordController,
-                      labelText: 'New Password',
-                      prefixIcon: Icons.lock,
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 10),
-                    _buildTextField(
-                      controller: _confirmNewPasswordController,
-                      labelText: 'Confirm New Password',
-                      prefixIcon: Icons.lock,
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _changePassword,
-                      child: Text('Change Password'),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class GigFunction {
@@ -55,14 +54,12 @@ class GigFunction {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userEmail = prefs.getString('userEmail');
     if (userEmail == null) {
-      // Handle the case where userEmail is null
       return false;
     }
 
     try {
-      DocumentReference gigRef = FirebaseFirestore.instance
-          .collection('gigs')
-          .doc(); // Automatically generates unique ID
+      DocumentReference gigRef =
+          FirebaseFirestore.instance.collection('gigs').doc();
 
       await gigRef.set({
         'available': isAvailable,
@@ -81,10 +78,13 @@ class GigFunction {
   static Future<List<DocumentSnapshot>> getGigsForUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userEmail = prefs.getString('userEmail');
-    String userId = FirebaseAuth.instance.currentUser!.uid; // Corrected
+    if (userEmail == null) {
+      return [];
+    }
+
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('gigs')
-        .where('userId', isEqualTo: userId) // Filter by current user's email
+        .where('userId', isEqualTo: userEmail)
         .get();
     return querySnapshot.docs;
   }
