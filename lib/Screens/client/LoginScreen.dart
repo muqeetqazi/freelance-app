@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:freelanceapp/Screens/client/SignUpScreen.dart';
 import 'package:freelanceapp/Screens/client/clientHomeScreen.dart';
 import 'package:freelanceapp/Screens/landingScreen.dart';
+import 'package:freelanceapp/Screens/services/functions/authFunctions.dart';
 import 'package:freelanceapp/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -190,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void onPressButton() async {
     var sharedPref = await SharedPreferences.getInstance();
-    sharedPref.setBool(SplashScreenState.KEYLOGIN, true);
+
     var gmail = t.text.toString();
     var password = passwords.text.toString();
     var prefs = await SharedPreferences.getInstance();
@@ -200,10 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
     bool isPasswordEmpty = passwords.text.isEmpty;
 
     if (!isgmailEmpty && !isPasswordEmpty) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ClientHomeScreen()),
-      );
+      await signIn(gmail, password);
     } else {
       // Show alert for empty fields
       showDialog(
@@ -212,6 +210,37 @@ class _LoginScreenState extends State<LoginScreen> {
           return AlertDialog(
             title: Text("Alert"),
             content: Text("Please fill in both gmail and password fields."),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text("OK"),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Future<void> signIn(String email, String password) async {
+    try {
+      await AuthServices.signinUserCompanies(email, password, context);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ClientHomeScreen()),
+      );
+      SharedPreferences prefss = await SharedPreferences.getInstance();
+      prefss.setBool(SplashScreenState.isClientLogin, true);
+    } catch (e) {
+      // Show alert for invalid email or password
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Alert"),
+            content: Text("Invalid email or password. Please try again."),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -239,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void onSignup() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => SignUpScreen()),
+      MaterialPageRoute(builder: (context) => ClientSignUpScreen()),
     );
   }
 }
